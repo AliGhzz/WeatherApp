@@ -8,9 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 import 'package:intl/intl.dart';
 import 'Models/DaysForcast.dart';
+import "package:flutter/services.dart";
 
 bool check = false;
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(MyApp());
 }
 
@@ -294,11 +297,12 @@ class _MyAppState extends State<MyApp> {
                               padding: EdgeInsets.fromLTRB(8, 8, 8, 20),
                               child: ElevatedButton(
                                 onPressed: () async {
-                                  var x =await sendRequestForCurrentWeather(
-                                          textEditingController.text);
+                                  var x = await sendRequestForCurrentWeather(
+                                      textEditingController.text);
                                   setState(() {
-                                    currentWeatherFuture= sendRequestForCurrentWeather(
-                                          textEditingController.text);
+                                    currentWeatherFuture =
+                                        sendRequestForCurrentWeather(
+                                            textEditingController.text);
                                     // sleep(Duration(seconds: 5));
                                     // await Future.delayed(Duration(seconds: 1));
                                     if (isExist(textEditingController.text)) {
@@ -370,7 +374,7 @@ class _MyAppState extends State<MyApp> {
                         ),
                         SizedBox(height: 20),
                         setIcon(cityDataModel.icon!, 60),
-                          
+
                         //get icons directly from openweathermap.com
                         // Image.network('http://openweathermap.org/img/w/${cityDataModel.icon}.png',),
                         Text(
@@ -433,7 +437,7 @@ class _MyAppState extends State<MyApp> {
                             color: Colors.grey[800],
                           ),
                         ),
-                          
+
                         //forcast
                         Container(
                             width: double.infinity,
@@ -572,7 +576,7 @@ class _MyAppState extends State<MyApp> {
                             color: Colors.grey[800],
                           ),
                         ),
-                          
+
                         //general information
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -785,35 +789,3 @@ showAlertDialog(BuildContext context) {
     },
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
