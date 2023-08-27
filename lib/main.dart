@@ -185,77 +185,42 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        drawer: Drawer(
-          backgroundColor: Colors.blue,
-          width: MediaQuery.of(context).size.width * 0.8,
-          child: Column(children: [
-            Container(
-              height: 70,
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                  child: ElevatedButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.account_circle_outlined),
-                          Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Text("Profile"),
-                          )
-                        ],
-                      ))),
-            ),
-            Container(
-              height: 50,
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  child: ElevatedButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.settings),
-                          Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Text("Settings"),
-                          )
-                        ],
-                      ))),
-            ),
-            Container(
-              height: 50,
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  child: ElevatedButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.logout),
-                          Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Text("Logout"),
-                          )
-                        ],
-                      ))),
-            )
-          ]),
-        ),
         appBar: AppBar(
           backgroundColor: Colors.blue,
           title: Text('Weather App'),
           elevation: 10,
           centerTitle: true,
+          actions: [
+            PopupMenuButton(
+                icon: Icon(
+                  Icons.more_vert,
+                  color: Colors.white,
+                ),
+                constraints:BoxConstraints.expand(width:125,height: 96),
+                color: Colors.blue,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                itemBuilder: (BuildContext context) {
+                  return [
+                    PopupMenuItem(
+                      height: 40,
+                      child: Row(
+                        children: [
+                          Icon(Icons.location_pin),
+                          Text("Default City",style: TextStyle(fontSize:12,color: Colors.white),),
+                        ],
+                      )),
+                    PopupMenuItem(
+                      height: 40,
+                      child: Row(
+                      children: [
+                        Icon(Icons.landscape),
+                        Text("BackGround",style: TextStyle(fontSize:12,color: Colors.white),),
+                      ],
+                    )),
+                    ];
+                })
+          ],
         ),
         body: FutureBuilder<CurrentCityData>(
           future: currentWeatherFuture,
