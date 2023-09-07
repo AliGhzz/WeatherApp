@@ -44,8 +44,8 @@ class _MyAppState extends State<MyApp> {
 
   void getForcast(lon, lat) async {
     List<Forcast> Days = [];
-    // var apiKey = '5a7d482b14cae03d7b6242c7aa8f51c8';
-    var apiKey = '0507284e820a6b9d25fa7acca7aea9dd';
+    var apiKey = '5a7d482b14cae03d7b6242c7aa8f51c8';
+    // var apiKey = '0507284e820a6b9d25fa7acca7aea9dd';
     try {
       var response = await Dio().get(
           'https://api.openweathermap.org/data/2.5/forecast',
@@ -55,6 +55,7 @@ class _MyAppState extends State<MyApp> {
             'appid': apiKey,
             'units': 'metric'
           });
+
       print("Succesful");
       final formatter = DateFormat.MMMd();
       // print(response.data['list'].lenght);
@@ -81,8 +82,8 @@ class _MyAppState extends State<MyApp> {
       forcastDaysStream!.add(Days);
     } on DioError catch (e) {
       print("be fana raftim");
-      print(e.response!.statusCode);
-      print(e.message);
+      // print(e.response!.statusCode);
+      // print(e.message);
       // ScaffoldMessenger.of(context)
       //     .showSnackBar(SnackBar(content: Text("There is an ")));
     }
@@ -91,6 +92,7 @@ class _MyAppState extends State<MyApp> {
   Future<CurrentCityData> sendRequestForCurrentWeather(String cityname) async {
     var apiKey = '0507284e820a6b9d25fa7acca7aea9dd';
     // var apiKey = '5a7d482b14cae03d7b6242c7aa8f51c8';
+
     try {
       var response = await Dio().get(
         'https://api.openweathermap.org/data/2.5/weather',
@@ -120,6 +122,7 @@ class _MyAppState extends State<MyApp> {
           response.data['main']['humidity']);
       // print(response.data);
       // print(response.statusCode);
+      print("kar kard");
       return citydata;
     } on DioError catch (e) {
       check = true;
@@ -196,32 +199,40 @@ class _MyAppState extends State<MyApp> {
                   Icons.more_vert,
                   color: Colors.white,
                 ),
-                constraints:BoxConstraints.expand(width:125,height: 96),
+                constraints: BoxConstraints.expand(width: 125, height: 96),
                 color: Colors.blue,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
                 itemBuilder: (BuildContext context) {
                   return [
                     PopupMenuItem(
-                      height: 40,
-                      child: Row(
-                        children: [
-                          Icon(Icons.location_pin),
-                          Text("Default City",style: TextStyle(fontSize:12,color: Colors.white),),
-                        ],
-                      )),
+                        height: 40,
+                        child: Row(
+                          children: [
+                            Icon(Icons.location_pin),
+                            Text(
+                              "Default City",
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.white),
+                            ),
+                          ],
+                        )),
                     PopupMenuItem(
-                      height: 40,
-                      child: Row(
-                      children: [
-                        Icon(Icons.landscape),
-                        Text("BackGround",style: TextStyle(fontSize:12,color: Colors.white),),
-                      ],
-                    )),
-                    ];
+                        height: 40,
+                        child: Row(
+                          children: [
+                            Icon(Icons.landscape),
+                            Text(
+                              "BackGround",
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.white),
+                            ),
+                          ],
+                        )),
+                  ];
                 })
           ],
-        ),
+        ), 
         body: FutureBuilder<CurrentCityData>(
           future: currentWeatherFuture,
           builder: (context, snapshot) {
@@ -229,7 +240,7 @@ class _MyAppState extends State<MyApp> {
             if (snapshot.hasData) {
               CurrentCityData? cityDataModel = snapshot.data;
               // getForcast(lon, lat);
-              //get sunrize time and sunset time
+              // get sunrize time and sunset time
               final formatter = DateFormat.jm();
               var sunrise =
                   formatter.format(new DateTime.fromMillisecondsSinceEpoch(
@@ -243,8 +254,8 @@ class _MyAppState extends State<MyApp> {
                 //if isUtc:true that shows time in London local time
                 isUtc: false,
               ));
-
-              return Container(
+              
+              return Container( 
                 // height: 1000000,
                 decoration: BoxDecoration(
                   image: DecorationImage(
@@ -268,10 +279,16 @@ class _MyAppState extends State<MyApp> {
                                     currentWeatherFuture =
                                         sendRequestForCurrentWeather(
                                             textEditingController.text);
-                                    // sleep(Duration(seconds: 5));
-                                    // await Future.delayed(Duration(seconds: 1));
                                     if (isExist(textEditingController.text)) {
-                                      showAlertDialog(context);
+                                      var snackbar = SnackBar(
+                                        content: Text("City Not Found"),
+                                        backgroundColor: Colors.blueAccent,
+                                        duration: Duration(seconds: 3),
+                                        showCloseIcon: true, 
+                                        closeIconColor: Colors.white,
+                                      );
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackbar);
                                     }
                                   });
                                 },
@@ -339,7 +356,7 @@ class _MyAppState extends State<MyApp> {
                         ),
                         SizedBox(height: 20),
                         setIcon(cityDataModel.icon!, 60),
-
+                                
                         //get icons directly from openweathermap.com
                         // Image.network('http://openweathermap.org/img/w/${cityDataModel.icon}.png',),
                         Text(
@@ -402,8 +419,7 @@ class _MyAppState extends State<MyApp> {
                             color: Colors.grey[800],
                           ),
                         ),
-
-                        //forcast
+                                
                         Container(
                             width: double.infinity,
                             height: 90,
@@ -541,8 +557,6 @@ class _MyAppState extends State<MyApp> {
                             color: Colors.grey[800],
                           ),
                         ),
-
-                        //general information
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -717,40 +731,4 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-}
-
-class MyAlert extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return showAlertDialog(context);
-  }
-}
-
-showAlertDialog(BuildContext context) {
-  // Create button
-  Widget okButton = TextButton(
-    child: Text("OK"),
-    onPressed: () {
-      check = false;
-      Navigator.of(context).pop();
-      // Navigator.pop(context);
-    },
-  );
-
-  // Create AlertDialog
-  AlertDialog alert = AlertDialog(
-    title: Text("Error occured"),
-    content: Text("City not found"),
-    actions: [
-      okButton,
-    ],
-  );
-
-  // show the dialog
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return alert;
-    },
-  );
 }
