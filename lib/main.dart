@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'Models/DaysForcast.dart';
 import "package:flutter/services.dart";
 
+int n = 0;
 bool check = false;
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,9 +74,7 @@ class _MyAppState extends State<MyApp> {
         Days.add(Day);
       }
       forcastDaysStream!.add(Days);
-    } on DioError catch (e) {
-      
-    }
+    } on DioError catch (e) {}
   }
 
   Future<CurrentCityData> sendRequestForCurrentWeather(String cityname) async {
@@ -107,9 +106,16 @@ class _MyAppState extends State<MyApp> {
           response.data['sys']['sunrise'],
           response.data['sys']['sunset'],
           response.data['main']['humidity']);
+      // check = false;
+      // print("object 1 " + check.toString());
       return citydata;
     } on DioError catch (e) {
-      check = true;
+      n++;
+      if (n % 2 == 1) {
+        check = true;
+        print("object 2 " + check.toString());
+      }
+
       cityname = cityName;
       return sendRequestForCurrentWeather(cityname);
     }
@@ -198,8 +204,8 @@ class _MyAppState extends State<MyApp> {
                               Icon(Icons.location_pin),
                               Text(
                                 "Default City",
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.white),
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.white),
                               ),
                             ],
                           )),
@@ -210,22 +216,22 @@ class _MyAppState extends State<MyApp> {
                               Icon(Icons.landscape),
                               Text(
                                 "BackGround",
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.white),
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.white),
                               ),
                             ],
                           )),
                     ];
                   })
             ],
-          ), 
+          ),
           body: FutureBuilder<CurrentCityData>(
             future: currentWeatherFuture,
             builder: (context, snapshot) {
               //snapshot corresponds to currentWeatherFuture
               if (snapshot.hasData) {
                 CurrentCityData? cityDataModel = snapshot.data;
-                // getForcast(lon, lat);
+                getForcast(lon, lat);
                 // get sunrize time and sunset time
                 final formatter = DateFormat.jm();
                 var sunrise =
@@ -240,8 +246,8 @@ class _MyAppState extends State<MyApp> {
                   //if isUtc:true that shows time in London local time
                   isUtc: false,
                 ));
-                
-                return Container( 
+
+                return Container(
                   // height: 1000000,
                   decoration: BoxDecoration(
                     image: DecorationImage(
@@ -261,20 +267,28 @@ class _MyAppState extends State<MyApp> {
                                   onPressed: () async {
                                     var x = await sendRequestForCurrentWeather(
                                         textEditingController.text);
+                                    // await Future.delayed(Duration(seconds: 5));
+                                    print(check.toString() + " 1");
                                     setState(() {
+                                      // FocusManager.instance.primaryFocus?.unfocus();
+                                      // Future<CurrentCityData>? currentWeatherFuture;
                                       currentWeatherFuture =
                                           sendRequestForCurrentWeather(
                                               textEditingController.text);
-                                      if (isExist(textEditingController.text)) {
+
+                                      print(check.toString() + " 2");
+                                      if (check) {
                                         var snackbar = SnackBar(
                                           content: Text("City Not Found"),
                                           backgroundColor: Colors.blueAccent,
                                           duration: Duration(seconds: 3),
-                                          showCloseIcon: true, 
+                                          showCloseIcon: true,
                                           closeIconColor: Colors.white,
                                         );
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(snackbar);
+                                        check = false;
+                                        print("last check print");
                                       }
                                     });
                                   },
@@ -295,17 +309,20 @@ class _MyAppState extends State<MyApp> {
                                   padding: EdgeInsets.fromLTRB(0, 14, 8, 0),
                                   child: TextField(
                                     controller: textEditingController,
-                                    style: TextStyle(color: Colors.orangeAccent),
+                                    style:
+                                        TextStyle(color: Colors.orangeAccent),
                                     decoration: InputDecoration(
                                       labelText: 'Enter City Name',
-                                      labelStyle: TextStyle(color: Colors.yellow),
+                                      labelStyle:
+                                          TextStyle(color: Colors.yellow),
                                       focusedBorder: UnderlineInputBorder(
                                         borderSide: BorderSide(
                                             width: 1, color: Colors.yellow),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                           borderSide: BorderSide(
-                                              width: 0.2, color: Colors.yellow)),
+                                              width: 0.2,
+                                              color: Colors.yellow)),
                                     ),
                                     cursorColor: Colors.orangeAccent,
                                     cursorHeight: 25,
@@ -322,7 +339,9 @@ class _MyAppState extends State<MyApp> {
                           Padding(
                             padding: EdgeInsets.only(top: 10),
                             child: Text(
-                                cityDataModel!.cityName.toString().toUpperCase(),
+                                cityDataModel!.cityName
+                                    .toString()
+                                    .toUpperCase(),
                                 style: TextStyle(
                                     color: Colors.white,
                                     letterSpacing: 3,
@@ -342,7 +361,7 @@ class _MyAppState extends State<MyApp> {
                           ),
                           SizedBox(height: 20),
                           setIcon(cityDataModel.icon!, 60),
-                                  
+
                           //get icons directly from openweathermap.com
                           // Image.network('http://openweathermap.org/img/w/${cityDataModel.icon}.png',),
                           Text(
@@ -358,7 +377,8 @@ class _MyAppState extends State<MyApp> {
                                       padding: EdgeInsets.only(top: 15),
                                       child: Text("MAX",
                                           style: TextStyle(
-                                              color: Colors.grey, fontSize: 12)),
+                                              color: Colors.grey,
+                                              fontSize: 12)),
                                     ),
                                     Padding(
                                       padding: EdgeInsets.only(top: 10),
@@ -366,7 +386,8 @@ class _MyAppState extends State<MyApp> {
                                           cityDataModel.maxTemp.toString() +
                                               "\u2103",
                                           style: TextStyle(
-                                              color: Colors.white, fontSize: 12)),
+                                              color: Colors.white,
+                                              fontSize: 12)),
                                     ),
                                   ],
                                 ),
@@ -381,18 +402,22 @@ class _MyAppState extends State<MyApp> {
                                 Column(
                                   children: [
                                     Padding(
-                                      padding: EdgeInsets.fromLTRB(10, 15, 0, 0),
+                                      padding:
+                                          EdgeInsets.fromLTRB(10, 15, 0, 0),
                                       child: Text("MIN",
                                           style: TextStyle(
-                                              color: Colors.grey, fontSize: 12)),
+                                              color: Colors.grey,
+                                              fontSize: 12)),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                                      padding:
+                                          EdgeInsets.fromLTRB(10, 10, 0, 0),
                                       child: Text(
                                           cityDataModel.minTemp.toString() +
                                               "\u2103",
                                           style: TextStyle(
-                                              color: Colors.white, fontSize: 12)),
+                                              color: Colors.white,
+                                              fontSize: 12)),
                                     ),
                                   ],
                                 ),
@@ -405,7 +430,7 @@ class _MyAppState extends State<MyApp> {
                               color: Colors.grey[800],
                             ),
                           ),
-                                  
+
                           Container(
                               width: double.infinity,
                               height: 90,
@@ -419,8 +444,8 @@ class _MyAppState extends State<MyApp> {
                                           shrinkWrap: true,
                                           itemCount: 19,
                                           scrollDirection: Axis.horizontal,
-                                          itemBuilder:
-                                              (BuildContext context, int index) {
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
                                             return Container(
                                               width: 70,
                                               child: Card(
