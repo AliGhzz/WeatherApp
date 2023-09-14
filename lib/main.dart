@@ -267,11 +267,9 @@ class _MyAppState extends State<MyApp> {
                                   onPressed: () async {
                                     var x = await sendRequestForCurrentWeather(
                                         textEditingController.text);
-                                    // await Future.delayed(Duration(seconds: 5));
                                     print(check.toString() + " 1");
                                     setState(() {
-                                      // FocusManager.instance.primaryFocus?.unfocus();
-                                      // Future<CurrentCityData>? currentWeatherFuture;
+                                      FocusManager.instance.primaryFocus?.unfocus();
                                       currentWeatherFuture =
                                           sendRequestForCurrentWeather(
                                               textEditingController.text);
