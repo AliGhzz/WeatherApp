@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Models/CurrentCityDataModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,10 @@ import 'package:progress_indicators/progress_indicators.dart';
 import 'package:intl/intl.dart';
 import 'Models/DaysForcast.dart';
 import "package:flutter/services.dart";
-//3.13.2
+
 int n = 0;
 bool check = false;
+bool? check2;
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -26,20 +28,21 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   TextEditingController textEditingController = TextEditingController();
+  TextEditingController textEditingController2 = TextEditingController();
   Future<CurrentCityData>? currentWeatherFuture;
   StreamController<List<Forcast>>? forcastDaysStream;
-
-  var cityName = 'karaj';
-  var lastcity = 'karaj';
+  late SharedPreferences prefs;
+  // final SharedPreferences prefs = awt SharedPreferences.getInstance();
+  String cityName = 'karaj';
+  String lastcity = 'karaj';
   var lon;
   var lat;
+  bool isValid = true;
 
   @override
   void initState() {
     super.initState();
-    // getForcast(lon, lat);
-    currentWeatherFuture = sendRequestForCurrentWeather(cityName);
-    // currentWeatherFuture = sendRequestForCurrentWeather(cityName);
+    currentWeatherFuture = sendRequestForCurrentWeather();
     forcastDaysStream = StreamController<List<Forcast>>();
   }
 
@@ -76,22 +79,28 @@ class _MyAppState extends State<MyApp> {
       forcastDaysStream!.add(Days);
     } on DioError catch (e) {}
   }
-  Future<CurrentCityData> sendRequestForCurrentWeather(String cityname) async {
-  // dynamic sendRequestForCurrentWeather(String cityname) async {
+
+  Future<CurrentCityData> sendRequestForCurrentWeather(
+      [String? cityname]) async {
+    // dynamic sendRequestForCurrentWeather(String cityname) async {
     var apiKey = '0507284e820a6b9d25fa7acca7aea9dd';
     // var apiKey = '5a7d482b14cae03d7b6242c7aa8f51c8';
-
+    if (cityname == null) {
+      print("amadam");
+      prefs = await SharedPreferences.getInstance();
+      cityname = prefs.getString('city');
+    }
     try {
       var response = await Dio().get(
         'https://api.openweathermap.org/data/2.5/weather',
-        queryParameters: {'q': cityname.trim() , 'appid': apiKey, 'units': 'metric'},
+        queryParameters: {'q': cityname, 'appid': apiKey, 'units': 'metric'},
         //we use  'units':'metric'   for get temperature in Celsius
       );
       lon = response.data['coord']['lon'];
       lat = response.data['coord']['lat'];
       getForcast(lon, lat);
       lastcity = cityName;
-      cityName = cityname;
+      cityName = cityname!;
       var citydata = CurrentCityData(
           response.data['name'],
           response.data['coord']['lon'],
@@ -106,18 +115,29 @@ class _MyAppState extends State<MyApp> {
           response.data['sys']['sunrise'],
           response.data['sys']['sunset'],
           response.data['main']['humidity']);
-      // check = false;
-      // print("object 1 " + check.toString());
       return citydata;
     } on DioError catch (e) {
       n++;
       if (n % 2 == 1) {
         check = true;
-        print("object 2 " + check.toString());
       }
 
       cityname = cityName;
       return sendRequestForCurrentWeather(cityname);
+    }
+  }
+
+  isCityExist(String cityname) async {
+    try {
+      var apiKey = '0507284e820a6b9d25fa7acca7aea9dd';
+      var response = await Dio().get(
+        'https://api.openweathermap.org/data/2.5/weather',
+        queryParameters: {'q': cityname, 'appid': apiKey, 'units': 'metric'},
+        //we use  'units':'metric'   for get temperature in Celsius
+      );
+      check2 = true;
+    } catch (e) {
+      check2 = false;
     }
   }
 
@@ -198,17 +218,74 @@ class _MyAppState extends State<MyApp> {
                   itemBuilder: (BuildContext context) {
                     return [
                       PopupMenuItem(
-                          height: 40,
-                          child: Row(
-                            children: [
-                              Icon(Icons.location_pin),
-                              Text(
-                                "Default City",
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.white),
-                              ),
-                            ],
-                          )),
+                        height: 40,
+                        child: Row(
+                          children: [
+                            Icon(Icons.location_pin),
+                            Text(
+                              "Default City",
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog.adaptive(
+                                  title: Text(
+                                    "Change Default City",
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                  content: TextField(
+                                    controller: textEditingController2,
+                                    decoration: InputDecoration(
+                                      errorText:
+                                          isValid ? null : "City not found",
+                                    ),
+                                  ),
+                                  titlePadding:
+                                      EdgeInsets.fromLTRB(15, 10, 25, 0),
+                                  contentPadding:
+                                      EdgeInsets.only(left: 15, right: 15),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () async {
+                                        print("1234");
+                                        await isCityExist(
+                                            textEditingController2.text.trim());
+                                        print("4321");
+                                        setState(() {
+                                          if (check2!) {
+                                            // check = false;
+                                            isValid = true;
+                                            prefs.setString(
+                                                'city',
+                                                textEditingController2.text
+                                                    .trim());
+                                            print("123");
+
+                                            currentWeatherFuture =
+                                                sendRequestForCurrentWeather(
+                                                    textEditingController2.text
+                                                        .trim());
+                                            textEditingController.text =
+                                                textEditingController2.text;
+                                            Navigator.pop(context);
+                                          } else {
+                                            isValid = false;
+                                            print("321");
+                                          }
+                                        });
+                                      },
+                                      child: Text("Change"),
+                                    )
+                                  ],
+                                );
+                              });
+                        },
+                      ),
                       PopupMenuItem(
                           height: 40,
                           child: Row(
@@ -246,7 +323,7 @@ class _MyAppState extends State<MyApp> {
                   //if isUtc:true that shows time in London local time
                   isUtc: false,
                 ));
-      
+
                 return Container(
                   // height: 1000000,
                   decoration: BoxDecoration(
@@ -266,14 +343,16 @@ class _MyAppState extends State<MyApp> {
                                 child: ElevatedButton(
                                   onPressed: () async {
                                     var x = await sendRequestForCurrentWeather(
-                                        textEditingController.text);
+                                        textEditingController.text.trim());
                                     print(check.toString() + " 1");
                                     setState(() {
-                                      FocusManager.instance.primaryFocus?.unfocus();
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
                                       currentWeatherFuture =
                                           sendRequestForCurrentWeather(
-                                              textEditingController.text);
-      
+                                              textEditingController.text
+                                                  .trim());
+
                                       print(check.toString() + " 2");
                                       if (check) {
                                         var snackbar = SnackBar(
@@ -286,7 +365,11 @@ class _MyAppState extends State<MyApp> {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(snackbar);
                                         check = false;
+
                                         print("last check print");
+                                      } else {
+                                        prefs.setString('city',
+                                            textEditingController.text.trim());
                                       }
                                     });
                                   },
@@ -359,7 +442,7 @@ class _MyAppState extends State<MyApp> {
                           ),
                           SizedBox(height: 20),
                           setIcon(cityDataModel.icon!, 60),
-      
+
                           //get icons directly from openweathermap.com
                           // Image.network('http://openweathermap.org/img/w/${cityDataModel.icon}.png',),
                           Text(
@@ -428,7 +511,7 @@ class _MyAppState extends State<MyApp> {
                               color: Colors.grey[800],
                             ),
                           ),
-      
+
                           Container(
                               width: double.infinity,
                               height: 90,
