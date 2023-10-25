@@ -194,9 +194,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp( 
+      // color: Colors.blue,
       debugShowCheckedModeBanner: false,
-      home: GestureDetector(
+      home: GestureDetector( 
         //using for close keyboard when you tap on screen
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
