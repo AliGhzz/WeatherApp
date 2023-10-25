@@ -9,7 +9,7 @@ import 'package:progress_indicators/progress_indicators.dart';
 import 'package:intl/intl.dart';
 import 'Models/DaysForcast.dart';
 import "package:flutter/services.dart";
-
+//3.13.2
 int n = 0;
 bool check = false;
 void main() {
@@ -76,15 +76,15 @@ class _MyAppState extends State<MyApp> {
       forcastDaysStream!.add(Days);
     } on DioError catch (e) {}
   }
-
   Future<CurrentCityData> sendRequestForCurrentWeather(String cityname) async {
+  // dynamic sendRequestForCurrentWeather(String cityname) async {
     var apiKey = '0507284e820a6b9d25fa7acca7aea9dd';
     // var apiKey = '5a7d482b14cae03d7b6242c7aa8f51c8';
 
     try {
       var response = await Dio().get(
         'https://api.openweathermap.org/data/2.5/weather',
-        queryParameters: {'q': cityname, 'appid': apiKey, 'units': 'metric'},
+        queryParameters: {'q': cityname.trim() , 'appid': apiKey, 'units': 'metric'},
         //we use  'units':'metric'   for get temperature in Celsius
       );
       lon = response.data['coord']['lon'];
@@ -246,7 +246,7 @@ class _MyAppState extends State<MyApp> {
                   //if isUtc:true that shows time in London local time
                   isUtc: false,
                 ));
-
+      
                 return Container(
                   // height: 1000000,
                   decoration: BoxDecoration(
@@ -273,7 +273,7 @@ class _MyAppState extends State<MyApp> {
                                       currentWeatherFuture =
                                           sendRequestForCurrentWeather(
                                               textEditingController.text);
-
+      
                                       print(check.toString() + " 2");
                                       if (check) {
                                         var snackbar = SnackBar(
@@ -359,7 +359,7 @@ class _MyAppState extends State<MyApp> {
                           ),
                           SizedBox(height: 20),
                           setIcon(cityDataModel.icon!, 60),
-
+      
                           //get icons directly from openweathermap.com
                           // Image.network('http://openweathermap.org/img/w/${cityDataModel.icon}.png',),
                           Text(
@@ -428,7 +428,7 @@ class _MyAppState extends State<MyApp> {
                               color: Colors.grey[800],
                             ),
                           ),
-
+      
                           Container(
                               width: double.infinity,
                               height: 90,
