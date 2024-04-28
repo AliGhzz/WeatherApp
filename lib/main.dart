@@ -203,6 +203,7 @@ class _MyAppState extends State<MyApp> {
           //using for close keyboard when you tap on screen
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               backgroundColor: Colors.blue,
               title: Text('Weather App',style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
@@ -218,6 +219,10 @@ class _MyAppState extends State<MyApp> {
                     color: Colors.blue,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
+                        onCanceled: () {
+                          textEditingController2.text="";
+                          isValid=true;
+                        },
                     itemBuilder: (BuildContext context) {
                       return [
                         PopupMenuItem(
@@ -234,15 +239,40 @@ class _MyAppState extends State<MyApp> {
                           ),
                           onTap: () {
                             showDialog(
+
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog.adaptive(
+                                  
                                     title: Text(
                                       "Change Default City",
                                       style: TextStyle(fontSize: 15),
                                     ),
                                     content: TextField(
                                       controller: textEditingController2,
+                                      onSubmitted: (value) async {
+                                        print("onsubmit");
+                                          await isCityExist(
+                                              textEditingController2.text.trim());
+                                          setState(() {
+                                            if (isValid) {
+                                              prefs.setString(
+                                                  'city',
+                                                  textEditingController2.text
+                                                      .trim());
+                                          
+                                              currentWeatherFuture =
+                                                  sendRequestForCurrentWeather(
+                                                      textEditingController2.text
+                                                          .trim());
+                                              textEditingController.text =
+                                                  textEditingController2.text;
+                                              Navigator.pop(context);
+                                            } else {
+                                          
+                                            }
+                                          });
+                                        },
                                       decoration: InputDecoration(
                                         errorText:
                                             isValid ? null : "City not found",
@@ -268,7 +298,7 @@ class _MyAppState extends State<MyApp> {
                                                   'city',
                                                   textEditingController2.text
                                                       .trim());
-        
+                                          
                                               currentWeatherFuture =
                                                   sendRequestForCurrentWeather(
                                                       textEditingController2.text
@@ -277,7 +307,7 @@ class _MyAppState extends State<MyApp> {
                                                   textEditingController2.text;
                                               Navigator.pop(context);
                                             } else {
-        
+                                          
                                             }
                                           });
                                         },
@@ -393,6 +423,31 @@ class _MyAppState extends State<MyApp> {
                                     padding: EdgeInsets.fromLTRB(0, 14, 8, 0),
                                     child: TextField(
                                       controller: textEditingController,
+                                      onSubmitted: (value)async {
+                                      await isCityExist(
+                                          textEditingController.text.trim());
+                                      setState(() {
+                                        FocusManager.instance.primaryFocus
+                                            ?.unfocus();
+                                        currentWeatherFuture =
+                                            sendRequestForCurrentWeather(
+                                                textEditingController.text
+                                                    .trim());
+
+                                        if (!cityFound) {
+                                          var snackbar = SnackBar(
+                                            content: Text("City Not Found"),
+                                            backgroundColor: Colors.blueAccent,
+                                            duration: Duration(seconds: 3),
+                                            showCloseIcon: true,
+                                            closeIconColor: Colors.white,
+                                          );
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(snackbar);
+                                        } else {
+                                        }
+                                      });
+                                    },
                                       style:
                                           TextStyle(color: Colors.orangeAccent),
                                       decoration: InputDecoration(
