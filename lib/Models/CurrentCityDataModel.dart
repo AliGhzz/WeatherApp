@@ -1,5 +1,5 @@
 class CurrentCityData {
-  String? cityName;
+  String? currentCity;
   num? lon;
   num? lat;
   int? id;
@@ -13,7 +13,7 @@ class CurrentCityData {
   int? sunset;
   int? humidity;
   CurrentCityData(
-    this.cityName,
+    this.currentCity,
     this.lon,
     this.lat,
     this.id,
