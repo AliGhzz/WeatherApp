@@ -1,16 +1,12 @@
-# f2
+<h1>🌤️ 🌦️ 🌍Weather App</h1>
+<div style="display: flex; justify-content: center; gap: 20px;">
+    <img src="https://github.com/AliGhzz/WeatherApp/assets/77566367/f8eacc05-075c-4aa9-9246-12ef86a1d346" style="width: 30%;">
+    <img src="https://github.com/AliGhzz/WeatherApp/assets/77566367/9bac45bf-fcc0-4ea1-b6e9-e202d7552559" style="width: 30%;">
+</div>
 
-A new Flutter project.
 
-## Getting Started
+ <h2>📱App Description</h2>
 
-This project is a starting point for a Flutter application.
+With this app, you can get the current weather and 4-day weather forecasts for your desired city. You can also search for different cities and change the default city.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
