@@ -365,7 +365,6 @@ class _MyAppState extends State<MyApp> {
                   ));
         
                   return Container(
-                    // height: 1000000,
                     decoration: BoxDecoration(
                       image: DecorationImage(
                           image: AssetImage("assets/images/galaxy.jpg"),
